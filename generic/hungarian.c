@@ -12,11 +12,12 @@ int torch_(Main_Hungarian)(lua_State *L) {
    const int batches = src->size[0];
    const int height = src->size[1];
    const int width = src->size[2];
+   int b, x, y;
    
-   for (int b = 0; b < batches; ++b) {
+   for (b = 0; b < batches; ++b) {
       int tmp_array[height * width];
-      for (int y = 0; y < height; ++y) {
-         for (int x = 0; x < width; ++x) {
+      for (y = 0; y < height; ++y) {
+         for (x = 0; x < width; ++x) {
             tmp_array[y*width+x] = THTensor_(get3d)(src, b, y, x)*1000.0;
          }
       }
@@ -25,16 +26,16 @@ int torch_(Main_Hungarian)(lua_State *L) {
       hungarian_problem_t p;
       int matrix_size = hungarian_init(&p,tmp_matrix,height,width,HUNGARIAN_MODE_MINIMIZE_COST);
 
-      for (int y = 0; y < height; ++y) {
-         for (int x = 0; x < width; ++x) {
+      for (y = 0; y < height; ++y) {
+         for (x = 0; x < width; ++x) {
             THTensor_(set3d)(dst, b, y, x, p.cost[y][x]/1000.0);
          }
       }
 
       hungarian_solve(&p);
 
-      for (int y = 0; y < height; ++y) {
-         for (int x = 0; x < width; ++x) {
+      for (y = 0; y < height; ++y) {
+         for (x = 0; x < width; ++x) {
             THLongTensor_set3d(ind, b, y, x, (long)p.assignment[y][x]);
          }
       }
