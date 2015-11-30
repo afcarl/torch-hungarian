@@ -12,9 +12,10 @@ int torch_(Main_Hungarian)(lua_State *L) {
    const int batches = src->size[0];
    const int height = src->size[1];
    const int width = src->size[2];
-   int b, x, y;
-   
+   int b;
+   #pragma omp parallel for private(b)
    for (b = 0; b < batches; ++b) {
+      int x, y;
       int tmp_array[height * width];
       for (y = 0; y < height; ++y) {
          for (x = 0; x < width; ++x) {
